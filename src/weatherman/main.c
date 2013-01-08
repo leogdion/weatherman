@@ -7,27 +7,50 @@
 //
 
 #include <stdio.h>
+#include <string.h>
 #include <curl/curl.h>
 #include <sqlite3.h>
 #include "json.h"
 
-static size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t write_data(char *ptr, size_t size, size_t nmemb, char *userdata)
 {
-    printf(userdata);
-    //size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
-    //return written;
-    return size;
+    if (strlen(userdata) > 0) {
+        strncat(userdata, ptr, nmemb);
+    } else {
+        strcpy(userdata, ptr);
+    }
+    return size * nmemb;
+}
+
+static void enumerate (json_value * value)
+{
+    int index;
+    for (index = 0; index < value->u.object.length; index++) {
+        puts(value->u.object.values[index].name);
+        if (value->u.object.values[index].value->type == json_object)
+        {
+            enumerate(value->u.object.values[index].value);
+        }
+        else
+        {
+            puts(value->u.object.values[index].value->u.string.ptr);
+        }
+    }
 }
 
 int main(int argc, const char * argv[])
 {
+    char * text;
     CURL *curl;
     CURLcode res;
+    
+    text  = (char *)malloc(sizeof(char));
+    memset(text, '\0', 4096 * sizeof(char));
     
     curl = curl_easy_init();
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, "http://api.wunderground.com/api/1128524773875b60/conditions/q/KLAN.json");
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, "test");
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, text);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         
 #ifdef SKIP_PEER_VERIFICATION
@@ -53,11 +76,15 @@ int main(int argc, const char * argv[])
          */
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 #endif
-        
         res = curl_easy_perform(curl);
+        json_value * value = json_parse(text);
         
+        enumerate(value);
         /* always cleanup */
         curl_easy_cleanup(curl);
+        free(text);
+        free(value);
+        
     }
     return 0;
 }
