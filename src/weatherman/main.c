@@ -97,7 +97,12 @@ int main(int argc, const char * argv[])
 	sqlite3_stmt * stmt;
 	int result;
     int tableExists = 0;
-    
+    table * conditions;
+	column * test;
+
+	test = create_column("example", SQLTYPE_TEXT, 0, 0);
+	conditions = create_table("name", 1, test);
+
     /*
     text = malloc(sizeof(char) * 256);
     getcwd(text);

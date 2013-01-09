@@ -23,4 +23,4 @@ create table conditions (
    precip_1hr_metric real not null,
    precip_today_metric  real not null,
    primary key (station_id, observation_epoch)
-);
+)
