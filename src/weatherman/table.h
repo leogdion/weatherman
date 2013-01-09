@@ -86,10 +86,14 @@ table * build_table(table_builder * builder) {
 const char * build_query_create(table * table) {
     char * query;
     char * current;
+    const char * p_keys[5];
+    
     int index;
+    int size_p_keys = 0;
     
     current = (char *)malloc(128 * sizeof(char));
     query = (char*)malloc(1024 * sizeof(char));
+    //p_keys = (char **)malloc(4 * sizeof(char*));
     
     sprintf(current, "create table %s(\n", table->name);
     strcpy(query, current);
@@ -97,10 +101,28 @@ const char * build_query_create(table * table) {
     for (index = 0; index < table->length; index = index + 1) {
         sprintf(current, "\"%s\" %s%s%s\n", table->columns[index].name, table->columns[index].type,
                 table->columns[index].nullable?"":" NOT NULL",
-                (index < table->length-1?",":""));
+                (index < table->length-1 || size_p_keys>0?",":""));
         strcat(query, current);
+        
+        if (table->columns[index].primary_key) {
+            p_keys[size_p_keys] = table->columns[index].name;
+            size_p_keys = size_p_keys + 1;
+        }
     }
     
+    
+    if (size_p_keys) {
+        strcat(query, "primary key(");
+        for(index = 0; index < size_p_keys; index = index + 1) {
+            strcat(query, p_keys[index]);
+            if (index < size_p_keys - 1) {
+                strcat(query, ", ");
+            }
+        }
+//        join_str(current, size_p_keys, ", ", p_keys);
+//        strcat(query, current);
+        strcat(query, ")\n");
+    }
     strcat(query, ");");
     
     return query;
