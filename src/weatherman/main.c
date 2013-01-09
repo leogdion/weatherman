@@ -5,12 +5,41 @@
 //  Created by Leo G Dion on 1/8/13.
 //  Copyright (c) 2013 Leo Dion. All rights reserved.
 //
+/*
+#define INITIALIZE_SQL "create table conditions ("
+"latitude real not null,"
+"longitude   real not null,"
+"elevation   real not null,"
+"station_id  text not null,
+observation_epoch integer not null,
+local_epoch integer not null,
+local_tz_offset   integer not null,
+weather  text not null,
+temp_c   real not null,
+relative_humidity real not null,
+wind_degrees   real not null,
+wind_kph real not null,
+wind_gust_kph  real not null,
+pressure_mb real not null,
+pressure_trend real not null,
+dewpoint_c  real,
+heat_index_c   real,
+windchill_c real,
+visibility_km  real not null,
+solarradiation real not null,
+UV real not null,
+precip_1hr_metric real not null,
+precip_today_metric  real not null,
+primary key (station_id, observation_epoch)
+);"
+*/
 
 #include <stdio.h>
 #include <string.h>
 #include <curl/curl.h>
 #include <sqlite3.h>
 #include "json.h"
+#include "table.h"
 
 static size_t write_data(char *ptr, size_t size, size_t nmemb, char *userdata)
 {
@@ -59,7 +88,7 @@ int main(int argc, const char * argv[])
 	CURLcode res;
 	json_value * value;
 	FILE * sqlFile;
-	char * sql;
+	//char * sql;
 	size_t fileSize;
 	size_t length;
 	const char * dbPath = "file:weatherman.db";
@@ -67,30 +96,41 @@ int main(int argc, const char * argv[])
 	sqlite3 * db;
 	sqlite3_stmt * stmt;
 	int result;
-
+    int tableExists = 0;
+    
+    /*
+    text = malloc(sizeof(char) * 256);
+    getcwd(text);
+    puts(text);
 	text  = (char *)malloc(sizeof(char) * 4096);
 	memset(text, '\0', 4096 * sizeof(char));
-
-	sqlFile = fopen("..\\..\\db\\initialize.sql", "r");
+// "..\\..\\db\\initialize.sql"
+	sqlFile = fopen("../../db/initialize.sql", "r");
 	fseek(sqlFile, 0, SEEK_END);
 	fileSize = ftell(sqlFile);
 	fseek(sqlFile, 0, SEEK_SET);
 	sql = (char*)malloc(sizeof(char) * fileSize);
 	length = fread(sql, 1, fileSize, sqlFile);
 	sql[length] = '\0';
-
+*/
 	sqlite3_open(dbPath, &db);
 
 	result = sqlite3_prepare(db, tableSql, -1, &stmt, NULL);
 
 	while ((result = sqlite3_step(stmt)) == 100) {
-		puts((char*)sqlite3_column_text(stmt, 0));
+		if (strcmp((char*)sqlite3_column_text(stmt, 0),"conditions") == 0) {
+            tableExists = 1;
+            break;
+        }
 	}
 	sqlite3_finalize(stmt);
 
-	result = sqlite3_prepare(db, sql, length, &stmt, NULL);
-	result = sqlite3_step(stmt);
-	sqlite3_finalize(stmt);
+    if (tableExists != 0) {
+//      result = sqlite3_prepare(db, sql, (int)length, &stmt, NULL);
+//      result = sqlite3_step(stmt);
+//      sqlite3_finalize(stmt);
+    }
+
 	sqlite3_close(db);
 
 
