@@ -83,6 +83,9 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="curllib.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="openldap.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
