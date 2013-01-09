@@ -99,12 +99,39 @@ int main(int argc, const char * argv[])
     int tableExists = 0;
     table_builder * conditions_build;
     table * conditions;
+    const char * query;
+
 	//column * test;
 
 	//test = create_column("example", SQLTYPE_TEXT, 0, 0);
 	conditions_build = create_table_builder("conditions", 32);
-    add_column(conditions_build, "example", SQLTYPE_TEXT, 0, 0, 0);
+    add_column(conditions_build, "station_id", SQLTYPE_TEXT, 0, 1, 0);
+    add_column(conditions_build, "observation_epoch", SQLTYPE_INTEGER, 0, 1, 0);
+    add_column(conditions_build, "latitude", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "longitude", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "elevation", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "local_epoch", SQLTYPE_INTEGER, 0, 0, 0);
+    add_column(conditions_build, "local_tz_offset", SQLTYPE_INTEGER, 0, 0, 0);
+    add_column(conditions_build, "weather", SQLTYPE_TEXT, 0, 0, 0);
+    add_column(conditions_build, "temp_c", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "relative_humidity", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "wind_degrees", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "wind_kph", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "wind_gust_kph", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "pressure_mb", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "pressure_trend", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "dewpoint_c", SQLTYPE_REAL, 1, 0, 0);
+    add_column(conditions_build, "heat_index_c", SQLTYPE_REAL, 1, 0, 0);
+    add_column(conditions_build, "windchill_c", SQLTYPE_REAL, 1, 0, 0);
+    add_column(conditions_build, "visibility_km", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "solarradiation", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "UV", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "precip_1hr_metric", SQLTYPE_REAL, 0, 0, 0);
+    add_column(conditions_build, "precip_today_metric", SQLTYPE_REAL, 0, 0, 0);
     conditions = build_table(conditions_build);
+    query = build_query_create(conditions);
+    puts(query);
+    return 0;
     /*
     text = malloc(sizeof(char) * 256);
     getcwd(text);

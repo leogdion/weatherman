@@ -11,7 +11,7 @@
 
 #define SQLTYPE_REAL "real"
 #define SQLTYPE_TEXT "text"
-#define SQLTYPE_INT "integer"
+#define SQLTYPE_INTEGER "integer"
 
 typedef int nullable_type;
 
@@ -81,6 +81,29 @@ table * build_table(table_builder * builder) {
     table * result;
     result = create_table(builder->name, builder->current_position, builder->columns);
     return result;
+}
+
+const char * build_query_create(table * table) {
+    char * query;
+    char * current;
+    int index;
+    
+    current = (char *)malloc(128 * sizeof(char));
+    query = (char*)malloc(1024 * sizeof(char));
+    
+    sprintf(current, "create table %s(\n", table->name);
+    strcpy(query, current);
+    
+    for (index = 0; index < table->length; index = index + 1) {
+        sprintf(current, "\"%s\" %s%s%s\n", table->columns[index].name, table->columns[index].type,
+                table->columns[index].nullable?"":" NOT NULL",
+                (index < table->length-1?",":""));
+        strcat(query, current);
+    }
+    
+    strcat(query, ");");
+    
+    return query;
 }
 
 #endif
