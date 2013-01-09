@@ -58,9 +58,25 @@ int main(int argc, const char * argv[])
 	CURL *curl;
 	CURLcode res;
 	json_value * value;
+	FILE * sqlFile;
+	char * sql;
+	size_t fileSize;
+	size_t length;
+	const char * dbPath = "file://weatherman.db";
+	sqlite3 * db;
 
 	text  = (char *)malloc(sizeof(char) * 4096);
 	memset(text, '\0', 4096 * sizeof(char));
+
+	sqlFile = fopen("..\\..\\db\\initialize.sql", "r");
+	fseek(sqlFile, 0, SEEK_END);
+	fileSize = ftell(sqlFile);
+	fseek(sqlFile, 0, SEEK_SET);
+	sql = (char*)malloc(sizeof(char) * fileSize);
+	length = fread(sql, 1, fileSize, sqlFile);
+	sql[length] = '\0';
+
+	sqlite3_open(dbPath, &db);
 
 	curl = curl_easy_init();
 	if(curl) {
