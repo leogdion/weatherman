@@ -23,6 +23,7 @@ typedef struct _column {
     const char * name;
     column_type type;
     nullable_type nullable;
+    int primary_key;
     parser parser;
 } column;
 
@@ -34,15 +35,17 @@ typedef struct _table {
 
 typedef struct _table_builder {
 	const char * name;
+    int current_position;
     column * columns;
 } table_builder;
 
-column * create_column(const char * name, column_type type, nullable_type nullable, parser parser) {
+column * create_column(const char * name, column_type type, nullable_type nullable, int primary_key, parser parser) {
     column * result;
     result = (column *)malloc(sizeof(column));
     result->name = name;
     result->type = type;
     result->nullable = nullable;
+    result->primary_key = primary_key;
     result->parser = parser;
     return result;
 }
@@ -57,7 +60,27 @@ table * create_table(const char * name, int length, column * columns) {
     return result;
 }
 
-table_builder * create_table_builder(const char * name) {
+table_builder * create_table_builder(const char * name, int max_columns) {
+    table_builder * builder;
+    builder = malloc(sizeof(table_builder));
+    builder->name = name;
+    builder->current_position = 0;
+    builder->columns = malloc(sizeof(column) * max_columns);
+    return builder;
+}
+
+column * add_column(table_builder * builder, const char * name, column_type type, nullable_type nullable, int primary_key, parser parser) {
+    column * result;
+    result = create_column(name, type, nullable, primary_key, parser);
+    builder->columns[builder->current_position] = *result;
+    builder->current_position = builder->current_position + 1;
+    return result;
+}
+
+table * build_table(table_builder * builder) {
+    table * result;
+    result = create_table(builder->name, builder->current_position, builder->columns);
+    return result;
 }
 
 #endif

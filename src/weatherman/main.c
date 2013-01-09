@@ -87,22 +87,24 @@ int main(int argc, const char * argv[])
 	CURL *curl;
 	CURLcode res;
 	json_value * value;
-	FILE * sqlFile;
+	//FILE * sqlFile;
 	//char * sql;
-	size_t fileSize;
-	size_t length;
+	//size_t fileSize;
+	//size_t length;
 	const char * dbPath = "file:weatherman.db";
 	const char * tableSql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
 	sqlite3 * db;
 	sqlite3_stmt * stmt;
 	int result;
     int tableExists = 0;
+    table_builder * conditions_build;
     table * conditions;
-	column * test;
+	//column * test;
 
-	test = create_column("example", SQLTYPE_TEXT, 0, 0);
-	conditions = create_table("name", 1, test);
-
+	//test = create_column("example", SQLTYPE_TEXT, 0, 0);
+	conditions_build = create_table_builder("conditions", 32);
+    add_column(conditions_build, "example", SQLTYPE_TEXT, 0, 0, 0);
+    conditions = build_table(conditions_build);
     /*
     text = malloc(sizeof(char) * 256);
     getcwd(text);
