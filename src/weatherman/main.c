@@ -62,8 +62,11 @@ int main(int argc, const char * argv[])
 	char * sql;
 	size_t fileSize;
 	size_t length;
-	const char * dbPath = "file://weatherman.db";
+	const char * dbPath = "file:weatherman.db";
+	const char * tableSql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
 	sqlite3 * db;
+	sqlite3_stmt * stmt;
+	int result;
 
 	text  = (char *)malloc(sizeof(char) * 4096);
 	memset(text, '\0', 4096 * sizeof(char));
@@ -77,6 +80,19 @@ int main(int argc, const char * argv[])
 	sql[length] = '\0';
 
 	sqlite3_open(dbPath, &db);
+
+	result = sqlite3_prepare(db, tableSql, -1, &stmt, NULL);
+
+	while ((result = sqlite3_step(stmt)) == 100) {
+		puts((char*)sqlite3_column_text(stmt, 0));
+	}
+	sqlite3_finalize(stmt);
+
+	result = sqlite3_prepare(db, sql, length, &stmt, NULL);
+	result = sqlite3_step(stmt);
+	sqlite3_finalize(stmt);
+	sqlite3_close(db);
+
 
 	curl = curl_easy_init();
 	if(curl) {
