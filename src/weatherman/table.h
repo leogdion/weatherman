@@ -39,6 +39,34 @@ typedef struct _table_builder {
     column * columns;
 } table_builder;
 
+typedef struct _table_column_data {
+    const char * name;
+    const void * value;
+} table_column_data;
+
+typedef struct _table_data {
+    table_column_data * columns;
+    unsigned int size;
+    unsigned int length;
+} table_data;
+
+table_data * create_table_data (unsigned int length) {
+    table_data * data;
+    data = (table_data *)malloc(sizeof(table_column_data) * length);
+    data->columns = (table_column_data*)malloc(sizeof(table_column_data) * length);
+    data->length = length;
+    data->size = 0;
+    return data;
+}
+
+int add_data_column(table_data * data, const char * name, const void * value) {
+    data->columns[data->size].name = name;
+    data->columns[data->size].value = value;
+    data->size = data->size + 1;
+    return data->size;
+}
+
+ 
 column * create_column(const char * name, column_type type, nullable_type nullable, int primary_key, parser parser) {
     column * result;
     result = (column *)malloc(sizeof(column));
@@ -82,6 +110,10 @@ table * build_table(table_builder * builder) {
     result = create_table(builder->name, builder->current_position, builder->columns);
     return result;
 }
+
+const char * build_query_insert(table * table, table_data * data) {
+    return "";
+};
 
 const char * build_query_create(table * table) {
     char * query;
