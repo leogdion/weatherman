@@ -35,8 +35,18 @@ static void enumerate (json_value * value)
 		case json_string:
 			puts(value->u.object.values[index].value->u.string.ptr);
 			break;
+		case json_integer:
+			printf("%d\n",(value->u.object.values[index].value->u.integer));
+			break;
+		case json_double:
+			printf("%f\n",value->u.object.values[index].value->u.dbl);
+			break;
+		case json_boolean:
+			printf("%d\n",value->u.object.values[index].value->u.boolean);
+			break;
+		case json_null:
+
 		default:
-			puts("?");
 			break;
 		}
 	}
