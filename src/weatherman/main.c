@@ -51,7 +51,7 @@ static size_t write_data(char *ptr, size_t size, size_t nmemb, char *userdata)
 	return size * nmemb;
 }
 
-static void enumerate (json_value * value)
+static void enumerate (table_data * data, json_value * value)
 {
 	int index;
 	for (index = 0; index < value->u.object.length; index++) {
@@ -59,21 +59,27 @@ static void enumerate (json_value * value)
 		switch (value->u.object.values[index].value->type) 
 		{
 		case json_object:
-			enumerate(value->u.object.values[index].value);
+			enumerate(data, value->u.object.values[index].value);
 			break;
 		case json_string:
-			puts(value->u.object.values[index].value->u.string.ptr);
+                add_data_column(data,value->u.object.values[index].name,value->u.object.values[index].value->u.string.ptr);
+//			puts(value->u.object.values[index].value->u.string.ptr);
 			break;
-		case json_integer:
-			printf("%d\n",(value->u.object.values[index].value->u.integer));
+            case json_integer:
+                add_data_column(data,value->u.object.values[index].name,&(value->u.object.values[index].value->u.integer));
+//			printf("%d\n",(value->u.object.values[index].value->u.integer));
 			break;
-		case json_double:
-			printf("%f\n",value->u.object.values[index].value->u.dbl);
+            case json_double:
+                add_data_column(data,value->u.object.values[index].name,&(value->u.object.values[index].value->u.dbl));
+//			printf("%f\n",value->u.object.values[index].value->u.dbl);
 			break;
-		case json_boolean:
-			printf("%d\n",value->u.object.values[index].value->u.boolean);
+            case json_boolean:
+                add_data_column(data,value->u.object.values[index].name,&(value->u.object.values[index].value->u.boolean));
+//			printf("%d\n",value->u.object.values[index].value->u.boolean);
 			break;
-		case json_null:
+            case json_null:
+                add_data_column(data,value->u.object.values[index].name,0);
+                break;
 
 		default:
 			break;
@@ -87,10 +93,6 @@ int main(int argc, const char * argv[])
 	CURL *curl;
 	CURLcode res;
 	json_value * value;
-	//FILE * sqlFile;
-	//char * sql;
-	//size_t fileSize;
-	//size_t length;
 	const char * dbPath = "file:weatherman.db";
 	const char * tableSql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
 	sqlite3 * db;
@@ -99,11 +101,11 @@ int main(int argc, const char * argv[])
     int tableExists = 0;
     table_builder * conditions_build;
     table * conditions;
+    table_data * data;
     const char * query;
-
-	//column * test;
-
-	//test = create_column("example", SQLTYPE_TEXT, 0, 0);
+    
+    text = (char*)malloc(sizeof(char) * 1024);
+    data = (table_data*)malloc(sizeof(table_data));
 	conditions_build = create_table_builder("conditions", 32);
     add_column(conditions_build, "station_id", SQLTYPE_TEXT, 0, 1, 0);
     add_column(conditions_build, "observation_epoch", SQLTYPE_INTEGER, 0, 1, 0);
@@ -130,23 +132,7 @@ int main(int argc, const char * argv[])
     add_column(conditions_build, "precip_today_metric", SQLTYPE_REAL, 0, 0, 0);
     conditions = build_table(conditions_build);
     query = build_query_create(conditions);
-    puts(query);
-    return 0;
-    /*
-    text = malloc(sizeof(char) * 256);
-    getcwd(text);
-    puts(text);
-	text  = (char *)malloc(sizeof(char) * 4096);
-	memset(text, '\0', 4096 * sizeof(char));
-// "..\\..\\db\\initialize.sql"
-	sqlFile = fopen("../../db/initialize.sql", "r");
-	fseek(sqlFile, 0, SEEK_END);
-	fileSize = ftell(sqlFile);
-	fseek(sqlFile, 0, SEEK_SET);
-	sql = (char*)malloc(sizeof(char) * fileSize);
-	length = fread(sql, 1, fileSize, sqlFile);
-	sql[length] = '\0';
-*/
+
 	sqlite3_open(dbPath, &db);
 
 	result = sqlite3_prepare(db, tableSql, -1, &stmt, NULL);
@@ -160,9 +146,9 @@ int main(int argc, const char * argv[])
 	sqlite3_finalize(stmt);
 
     if (tableExists != 0) {
-//      result = sqlite3_prepare(db, sql, (int)length, &stmt, NULL);
-//      result = sqlite3_step(stmt);
-//      sqlite3_finalize(stmt);
+        result = sqlite3_prepare(db, query, strlen(query), &stmt, NULL);
+        result = sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
     }
 
 	sqlite3_close(db);
@@ -200,7 +186,7 @@ int main(int argc, const char * argv[])
 		res = curl_easy_perform(curl);
 		value = json_parse(text);
 
-		enumerate(value);
+		enumerate(data, value);
 		/* always cleanup */
 		curl_easy_cleanup(curl);
 		free(text);

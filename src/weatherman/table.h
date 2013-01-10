@@ -17,7 +17,7 @@ typedef int nullable_type;
 
 typedef const char * column_type;
 
-typedef char * (*parser)(void*);
+typedef char * (*parser)(const void*);
 
 typedef struct _column {
     const char * name;
@@ -112,7 +112,49 @@ table * build_table(table_builder * builder) {
 }
 
 const char * build_query_insert(table * table, table_data * data) {
-    return "";
+    char * query;
+    char * current;
+    int index, jndex;
+    char * names;
+    char * values;
+    
+    current = (char *)malloc(128 * sizeof(char));
+    query = (char*)malloc(1024 * sizeof(char));
+    names = (char*)malloc(1024 * sizeof(char));
+    values = (char*)malloc(1024 * sizeof(char));
+    
+    sprintf(current, "insert into %s (\n", table->name);
+    strcpy(query, current);
+    
+    for (index = 0; index < table->length; index = index + 1) {
+        for (jndex = 0; jndex < data->length; jndex = jndex + 1) {
+            if (strcmp(table->columns[index].name, data->columns[index].name) == 0) {
+                strcat(names, table->columns[index].name);
+                strcat(names, ", ");
+            }
+        }
+    }
+    
+    for (index = 0; index < table->length; index = index + 1) {
+        for (jndex = 0; jndex < data->length; jndex = jndex + 1) {
+            if (strcmp(table->columns[index].name, data->columns[index].name) == 0) {
+                char * value_str;
+                if (table->columns[index].parser) {
+                    value_str = table->columns[index].parser(data->columns[index].value);
+                } else {
+                    value_str = (char*)data->columns[index].value;
+                }
+                strcat(values, value_str);
+                strcat(names, ", ");
+            }
+        }
+    }
+    
+    strncpy(query, names, strlen(names) - 2);
+    strcpy(query, ") values (");
+    strncpy(query, values, strlen(values) - 2);
+    
+    return query;
 };
 
 const char * build_query_create(table * table) {
@@ -125,7 +167,6 @@ const char * build_query_create(table * table) {
     
     current = (char *)malloc(128 * sizeof(char));
     query = (char*)malloc(1024 * sizeof(char));
-    //p_keys = (char **)malloc(4 * sizeof(char*));
     
     sprintf(current, "create table %s(\n", table->name);
     strcpy(query, current);
