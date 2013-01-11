@@ -211,10 +211,10 @@ int main(int argc, const char * argv[])
 		}
 		/* always cleanup */
 		curl_easy_cleanup(curl);
-		//free(text);
-		//free(value);
 
 	}
+	//free(text);
+	//free(value);
 	return 0;
 }
 

@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClCompile Include="json.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="table.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\db\initialize.sql" />
