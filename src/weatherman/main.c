@@ -118,6 +118,8 @@ int main(int argc, const char * argv[])
     const char * query;
 	char * format;
     
+	puts("");
+			//printf("The color: %s\n", "blue");
     text = (char*)malloc(sizeof(char) * 1024);
 	memset(text, '\0', 1024 * sizeof(char));
 	conditions_build = create_table_builder("conditions", 32);
@@ -209,8 +211,8 @@ int main(int argc, const char * argv[])
 		}
 		/* always cleanup */
 		curl_easy_cleanup(curl);
-		free(text);
-		free(value);
+		//free(text);
+		//free(value);
 
 	}
 	return 0;
