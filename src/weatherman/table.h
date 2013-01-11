@@ -13,9 +13,28 @@
 #define SQLTYPE_TEXT "text"
 #define SQLTYPE_INTEGER "integer"
 
+#define DATATYPE_REAL "real"
+#define DATATYPE_TEXT "text"
+#define DATATYPE_INTEGER "integer"
+#define DATATYPE_BOOLEAN "boolean"
+
+typedef enum COLUMN_TYPE {
+	sqltype_real,
+	sqltype_text,
+	sqltype_integer
+} column_type;
+
+typedef enum DATA_TYPE {
+	datatype_null,
+	datatype_real,
+	datatype_text,
+	datatype_integer,
+	datatype_boolean
+} data_type;
+
 typedef int nullable_type;
 
-typedef const char * column_type;
+//typedef const char * column_type;
 
 typedef char * (*parser)(const void*);
 
@@ -42,6 +61,7 @@ typedef struct _table_builder {
 typedef struct _table_column_data {
     const char * name;
     const void * value;
+	data_type type;
 } table_column_data;
 
 typedef struct _table_data {
@@ -49,6 +69,16 @@ typedef struct _table_data {
     unsigned int size;
     unsigned int length;
 } table_data;
+
+const char * get_columntype_name (column_type type) {
+	if (type == sqltype_real) {
+		return SQLTYPE_REAL;
+	} else if (type == sqltype_integer) {
+		return SQLTYPE_INTEGER;
+	} else if (type == sqltype_text) {
+		return SQLTYPE_TEXT;
+	}
+}
 
 table_data * create_table_data (unsigned int length) {
     table_data * data;
@@ -59,9 +89,10 @@ table_data * create_table_data (unsigned int length) {
     return data;
 }
 
-int add_data_column(table_data * data, const char * name, const void * value) {
+int add_data_column(table_data * data, const char * name, const void * value, data_type data_type) {
     data->columns[data->size].name = name;
     data->columns[data->size].value = value;
+	data->columns[data->size].type = data_type;
     data->size = data->size + 1;
     return data->size;
 }
@@ -90,10 +121,10 @@ table * create_table(const char * name, int length, column * columns) {
 
 table_builder * create_table_builder(const char * name, int max_columns) {
     table_builder * builder;
-    builder = malloc(sizeof(table_builder));
+    builder = (table_builder *)malloc(sizeof(table_builder));
     builder->name = name;
     builder->current_position = 0;
-    builder->columns = malloc(sizeof(column) * max_columns);
+    builder->columns = (column*)malloc(sizeof(column) * max_columns);
     return builder;
 }
 
@@ -172,7 +203,7 @@ const char * build_query_create(table * table) {
     strcpy(query, current);
     
     for (index = 0; index < table->length; index = index + 1) {
-        sprintf(current, "\"%s\" %s%s%s\n", table->columns[index].name, table->columns[index].type,
+        sprintf(current, "\"%s\" %s%s%s\n", table->columns[index].name, get_columntype_name(table->columns[index].type),
                 table->columns[index].nullable?"":" NOT NULL",
                 (index < table->length-1 || size_p_keys>0?",":""));
         strcat(query, current);
