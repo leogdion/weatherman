@@ -205,10 +205,13 @@ int main(int argc, const char * argv[])
 		format = (char*)malloc(sizeof(char) * 64);
 		data = create_table_data(32);
 		enumerate(data, value);
-		for (index = 0; index < data->size; index = index + 1) {
+/*
+        for (index = 0; index < data->size; index = index + 1) {
 			sprintf(format, "%%s: %s\n", get_format_value(data->columns[index].type));
 			printf(format, data->columns[index].name, data->columns[index].value);
 		}
+ */
+        puts(build_query_insert(conditions, data));
 		/* always cleanup */
 		curl_easy_cleanup(curl);
 

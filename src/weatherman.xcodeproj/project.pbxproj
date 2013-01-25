@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B0DBD7916B3248A00F7525A /* table.c in Sources */ = {isa = PBXBuildFile; fileRef = 7B0DBD7816B3248A00F7525A /* table.c */; };
 		7B8B65D5169C98BC00254D6B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B65D4169C98BC00254D6B /* main.c */; };
 		7B8B65D7169C98BC00254D6B /* weatherman.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7B8B65D6169C98BC00254D6B /* weatherman.1 */; };
 		7B8B65DE169C9B7600254D6B /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8B65DD169C9B7600254D6B /* libcurl.dylib */; };
@@ -28,6 +29,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7B0DBD7816B3248A00F7525A /* table.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = table.c; sourceTree = "<group>"; };
 		7B2A95B0169DBDF800F7DCB7 /* table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = table.h; sourceTree = "<group>"; };
 		7B8B65D0169C98BC00254D6B /* weatherman */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = weatherman; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B8B65D4169C98BC00254D6B /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 		7B8B65D3169C98BC00254D6B /* weatherman */ = {
 			isa = PBXGroup;
 			children = (
+				7B0DBD7816B3248A00F7525A /* table.c */,
 				7B8B65E1169CA14800254D6B /* json.c */,
 				7B8B65E2169CA14800254D6B /* json.h */,
 				7B8B65D4169C98BC00254D6B /* main.c */,
@@ -134,6 +137,7 @@
 			files = (
 				7B8B65D5169C98BC00254D6B /* main.c in Sources */,
 				7B8B65E3169CA14800254D6B /* json.c in Sources */,
+				7B0DBD7916B3248A00F7525A /* table.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

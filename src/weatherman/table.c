@@ -93,7 +93,7 @@ const char * build_query_insert(table * table, table_data * data) {
     
     for (index = 0; index < table->length; index = index + 1) {
         for (jndex = 0; jndex < data->length; jndex = jndex + 1) {
-            if (strcmp(table->columns[index].name, data->columns[index].name) == 0) {
+            if (strcmp(table->columns[index].name, data->columns[jndex].name) == 0) {
                 strcat(names, table->columns[index].name);
                 strcat(names, ", ");
             }
@@ -102,23 +102,29 @@ const char * build_query_insert(table * table, table_data * data) {
     
     for (index = 0; index < table->length; index = index + 1) {
         for (jndex = 0; jndex < data->length; jndex = jndex + 1) {
-            if (strcmp(table->columns[index].name, data->columns[index].name) == 0) {
+            if (strcmp(table->columns[index].name, data->columns[jndex].name) == 0) {
                 char * value_str;
                 if (table->columns[index].parser) {
-                    value_str = table->columns[index].parser(data->columns[index].value);
+                    value_str = table->columns[index].parser(data->columns[jndex].value);
                 } else {
-                    value_str = (char*)data->columns[index].value;
+                    value_str = (char*)data->columns[jndex].value;
+                }
+                if (data->columns[jndex].type == datatype_text) {
+                    strcat(values, "\"");
                 }
                 strcat(values, value_str);
-                strcat(names, ", ");
+                if (data->columns[jndex].type == datatype_text) {
+                    strcat(values, "\"");
+                }
+                strcat(values, ", ");
             }
         }
     }
     
-    strncpy(query, names, strlen(names) - 2);
-    strcpy(query, ") values (");
-    strncpy(query, values, strlen(values) - 2);
-    
+    strncat(query, names, strlen(names) - 2);
+    strcat(query, ") values (");
+    strncat(query, values, strlen(values) - 2);
+    strcat(query, ")");
     return query;
 };
 
